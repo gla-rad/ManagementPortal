@@ -1,6 +1,6 @@
-import { addLangs, applyTranslateToMenu, applyTranslateToSingleMenu } from './../../../util/translateHelper';
+import { addLangs, applyTranslateToMenu, applyTranslateToSingleMenu, loadLang } from './../../../util/translateHelper';
 /*
- * Copyright (c) 2022 Maritime Connectivity Platform Consortium
+ * Copyright (c) 2023 Maritime Connectivity Platform Consortium
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import { formatVesselToUpload } from '../../../util/dataFormatter';
 import { Device } from '../../../backend-api/identity-registry/model/device';
 import { Location } from '@angular/common';
 import { Organization } from '../../../backend-api/identity-registry/model/organization';
-import { Entity } from '../../../backend-api/identity-registry/model/entity';
 import { EntityTypes, ResourceType, MenuTypeIconNames, MenuTypeNames } from '../../models/menuType';
 import { ColumnForResource } from '../../models/columnForMenu';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
@@ -83,6 +82,7 @@ export class DetailComponent implements OnInit {
     public translate: TranslateService,
     ) {
       addLangs(translate);
+      loadLang(translate);
   }
 
   ngOnInit(): void {
@@ -201,13 +201,13 @@ export class DetailComponent implements OnInit {
   }
 
   delete() {
-    let message = this.translate.instant('warning.list.beforeDeletion');
+    let message = this.translate.instant('warning.resource.beforeDeletion');
     message = EntityTypes.indexOf(this.menuType) >= 0 ?
-      message + this.translate.instant('warning.list.beforeRevoke') : message;
+      message + this.translate.instant('warning.resource.beforeRevoke') : message;
     if (confirm(message)) {
       this.deleteData(this.menuType, this.orgMrn, this.entityMrn, this.instanceVersion).subscribe(
         res => {
-          this.notifierService.notify('success', this.menuTypeName + this.translate.instant('success.list.delete'));
+          this.notifierService.notify('success', this.menuTypeName + this.translate.instant('success.resource.delete'));
           this.moveToListPage();
         },
         err => this.notifierService.notify('error',
@@ -275,7 +275,7 @@ export class DetailComponent implements OnInit {
 
   submit(body: any) {
     if (this.menuType === ResourceType.Role) {
-      this.organizationControllerService.getOrganizationByMrn(this.orgMrn).subscribe(
+      this.organizationControllerService.getOrganization1(this.orgMrn).subscribe(
         res => this.submitDataToBackend({ ...body, idOrganization: res.id}),
         err => this.notifierService.notify('error',
           this.translate.instant('error.resource.fetchOrgInfo')),
@@ -321,7 +321,7 @@ export class DetailComponent implements OnInit {
     }
   }
 
-  registerData = (context: ResourceType, body: object, orgMrn: string): Observable<Entity> => {
+  registerData = (context: ResourceType, body: object, orgMrn: string): Observable<any> => {
     if (context === ResourceType.User) {
       return this.userControllerService.createUser(body as User, orgMrn);
     } else if (context === ResourceType.Device) {
@@ -342,7 +342,7 @@ export class DetailComponent implements OnInit {
     return new Observable();
   }
 
-  updateData = (context: ResourceType, body: object, orgMrn: string, entityMrn: string, version?: string, instanceId?: number): Observable<Entity> => {
+  updateData = (context: ResourceType, body: object, orgMrn: string, entityMrn: string, version?: string, instanceId?: number): Observable<any> => {
     if (context === ResourceType.User) {
       return this.userControllerService.updateUser(body as User, orgMrn, entityMrn);
     } else if (context === ResourceType.Device) {
@@ -363,7 +363,7 @@ export class DetailComponent implements OnInit {
     return new Observable();
   }
 
-  deleteData = (context: ResourceType, orgMrn: string, entityMrn: string, version?: string, instanceId?: number): Observable<Entity> => {
+  deleteData = (context: ResourceType, orgMrn: string, entityMrn: string, version?: string, instanceId?: number): Observable<any> => {
     if (context === ResourceType.User) {
       return this.userControllerService.deleteUser(orgMrn, entityMrn);
     } else if (context === ResourceType.Device) {
@@ -384,7 +384,7 @@ export class DetailComponent implements OnInit {
     return new Observable();
   }
 
-  loadDataContent = (context: ResourceType, orgMrn: string, entityMrn: string, version?: string, instanceId?: number): Observable<Entity> => {
+  loadDataContent = (context: ResourceType, orgMrn: string, entityMrn: string, version?: string, instanceId?: number): Observable<any> => {
     if (context === ResourceType.User) {
       return this.userControllerService.getUser(orgMrn, entityMrn);
     } else if (context === ResourceType.Device) {
@@ -396,7 +396,7 @@ export class DetailComponent implements OnInit {
     } else if (context === ResourceType.Service && version) {
       return this.serviceControllerService.getServiceVersion(orgMrn, entityMrn, version);
     } else if (context === ResourceType.Organization) {
-      return this.organizationControllerService.getOrganizationByMrn(entityMrn);
+      return this.organizationControllerService.getOrganization1(entityMrn);
     } else if (context === ResourceType.Instance) {
       return this.instanceControllerService.getInstance(instanceId);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Maritime Connectivity Platform Consortium
+ * Copyright (c) 2023 Maritime Connectivity Platform Consortium
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,22 +48,22 @@ export class AuthService {
   }
 
   private findPermissionRoles() {
-  if (this.authState.loggedIn) {
-    this.roleControllerService.getMyRole(this.authState.orgMrn).subscribe(
-      roles => {
-        this.authState.permission = rolesToPermission(roles);
-        this.authState.rolesLoaded = true;
-        this.rolesLoaded.emit('');
-      },
-      error => {
-        this.authState.permission = AuthPermission.User;
-        this.notifierService.notify('error', 'Error trying to fetch user permissions - ' + error.message);
-        this.authState.rolesLoaded = true;
-        this.rolesLoaded.emit('');
-      }
-    );
+    if (this.authState.loggedIn) {
+      this.roleControllerService.getMyRole(this.authState.orgMrn).subscribe(
+        roles => {
+          this.authState.permission = rolesToPermission(roles);
+          this.authState.rolesLoaded = true;
+          this.rolesLoaded.emit('');
+        },
+        error => {
+          this.authState.permission = AuthPermission.User;
+          this.notifierService.notify('error', 'Error trying to fetch user permissions - ' + error.message);
+          this.authState.rolesLoaded = true;
+          this.rolesLoaded.emit('');
+        }
+      );
+    }
   }
-}
 private createAuthState(): AuthState {
   return {
     loggedIn: AuthService.staticAuthInfo.loggedIn,
@@ -123,7 +123,9 @@ private createAuthState(): AuthState {
 
   login() {
   	const url = window.location;
-    AuthService.staticAuthInfo.authz.login({redirectUri:  url.protocol + '//' + url.host + '/pages/ir/users/'});
+    AuthService.staticAuthInfo.authz.login({
+      redirectUri:  url.protocol + '//' + url.host + '/pages/ir/organizations/'
+    });
   }
 
   logout() {

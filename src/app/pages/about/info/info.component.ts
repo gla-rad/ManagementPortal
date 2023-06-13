@@ -1,6 +1,6 @@
-import { addLangs } from './../../../util/translateHelper';
+import { addLangs, loadLang } from './../../../util/translateHelper';
 /*
- * Copyright (c) 2022 Maritime Connectivity Platform Consortium
+ * Copyright (c) 2023 Maritime Connectivity Platform Consortium
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ export class InfoComponent implements OnInit {
     public translate: TranslateService,
     ) {
       addLangs(translate);
+      loadLang(translate);
     }
 
   ngOnInit(): void {
