@@ -36,14 +36,18 @@ export class AppConfig {
   static TERMS_OF_USE: string;
   static MP_CONTACT: string;
   static MP_VERSION: string;
+  static MP_NAME: string;
+  static FOOTER_NAME: string;
+  static FOOTER_LINK: string;
+  static LOGO_IMG: string;
 
   public static _initialize() {
-    AppConfig.IR_BASE_PATH = environment.irBasePath,
-    AppConfig.SR_BASE_PATH = environment.hasServiceRegistry ? environment.srBasePath : '',
+    AppConfig.IR_BASE_PATH = environment.irBasePath.replace(/\/$/, ''),
+    AppConfig.SR_BASE_PATH = environment.hasServiceRegistry ? environment.srBasePath.replace(/\/$/, '') : '',
     AppConfig.ENVIRONMENT_TITLE = environment.environmentTitle,
     AppConfig.IDP_NAMESPACE = environment.idpNamespace;
     AppConfig.HAS_SERVICE_REGISTRY = environment.hasServiceRegistry;
-    AppConfig.OIDC_BASE_PATH = environment.oidcBasePath;
+    AppConfig.OIDC_BASE_PATH = environment.oidcBasePath.replace(/\/$/, '');
     AppConfig.ENVIRONMENT_NAME = environment.environmentName;
     AppConfig.IR_PROVIDER = environment.irProvider;
     AppConfig.IR_CONTACT = environment.irContact;
@@ -52,9 +56,13 @@ export class AppConfig {
     AppConfig.HAS_MSR_LEDGER = environment.hasMSRLedger;
     AppConfig.LEDGER_PATH = environment.hasMSRLedger ? environment.ledgerPath : '';
     AppConfig.MP_PROVIDER = environment.mpProvider;
+    AppConfig.MP_NAME = environment.mpName;
     AppConfig.TERMS_OF_USE = environment.termsOfUse;
     AppConfig.MP_CONTACT = environment.mpContact;
     AppConfig.MP_VERSION = require( '../../package.json').version;
+    AppConfig.FOOTER_NAME = environment.footerName;
+    AppConfig.FOOTER_LINK = environment.footerLink;
+    AppConfig.LOGO_IMG = environment.logoImg;
   }
 }
 AppConfig._initialize();

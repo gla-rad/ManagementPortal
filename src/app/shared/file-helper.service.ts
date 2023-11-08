@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-import { DocDto } from '../backend-api/service-registry';
-import { XmlDto } from '../backend-api/service-registry';
-import { Injectable } from '@angular/core';
-import { NotifierService } from 'angular-notifier';
-import * as fileSaver from "file-saver";
-import * as JSZip from 'jszip';
-import { CertificateBundle } from '../backend-api/identity-registry';
+import {DocDto, XmlDto} from '../backend-api/service-registry';
+import {Injectable} from '@angular/core';
+import {NotifierService} from 'angular-notifier';
+import * as fileSaver from 'file-saver';
+import JSZip from 'jszip';
+import {CertificateBundle} from './models/certificateBundle';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FileHelperService {
   constructor() {
@@ -31,53 +30,33 @@ export class FileHelperService {
   }
 
   public downloadPemCertificate(certificateBundle: CertificateBundle, entityName: string,
-                                serverGeneratedKeys: boolean, notifierService: NotifierService) {
+                                notifierService: NotifierService) {
     try {
       const nameNoSpaces = entityName.split(' ').join('_');
 
-      const certificate = serverGeneratedKeys ?
-        this.replaceNewLines(certificateBundle.pemCertificate.certificate)
-        : certificateBundle.pemCertificate.certificate;
-      const publicKey = serverGeneratedKeys ?
-        this.replaceNewLines(certificateBundle.pemCertificate.publicKey)
-        : certificateBundle.pemCertificate.publicKey;
-      const privateKey = serverGeneratedKeys ?
-        this.replaceNewLines(certificateBundle.pemCertificate.privateKey)
-        : certificateBundle.pemCertificate.privateKey;
-      const pkcs12Keystore = certificateBundle.pkcs12Keystore && typeof(certificateBundle.pkcs12Keystore) === 'string' ?
-        this.convertBase64ToByteArray(certificateBundle.pkcs12Keystore) as ArrayBuffer
-        : certificateBundle.pkcs12Keystore;
-
       const zip = new JSZip();
-      zip.file("Certificate_" + nameNoSpaces + ".pem", certificate);
-      if (privateKey) {
-        zip.file("PrivateKey_" + nameNoSpaces + ".pem", privateKey);
+      zip.file("Certificate_" + nameNoSpaces + ".pem", certificateBundle.certificate);
+      if (certificateBundle.privateKey) {
+        zip.file("PrivateKey_" + nameNoSpaces + ".pem", certificateBundle.privateKey);
       }
-      if (publicKey) {
-        zip.file("PublicKey_" + nameNoSpaces + ".pem", publicKey);
+      if (certificateBundle.publicKey) {
+        zip.file("PublicKey_" + nameNoSpaces + ".pem", certificateBundle.publicKey);
+      }
+      if (certificateBundle.pkcs12Keystore) {
+        zip.file("Keystore_" + nameNoSpaces + ".p12", certificateBundle.pkcs12Keystore);
       }
       if (certificateBundle.keystorePassword) {
-        zip.file("KeystorePassword.txt", this.replaceNewLines(certificateBundle.keystorePassword));
+        zip.file("KeystorePassword_" + nameNoSpaces + ".txt", certificateBundle.keystorePassword);
       }
-      if (certificateBundle.jksKeystore) {
-        const jksByteArray = this.convertBase64ToByteArray(certificateBundle.jksKeystore);
-        const blob = new Blob([jksByteArray]);
-        zip.file("Keystore_" + nameNoSpaces + ".jks", blob);
-      }
-      if (pkcs12Keystore) {
-        const p12ByteArray = pkcs12Keystore;
-        const blob = new Blob([p12ByteArray]);
-        zip.file("Keystore_" + nameNoSpaces + ".p12", blob);
-      }
-      zip.generateAsync({type:"blob"}).then(function (content) {
+      zip.generateAsync({type: "blob"}).then(function (content) {
         fileSaver.saveAs(content, "Certificate_" + nameNoSpaces + ".zip");
       });
-    } catch ( error ) {
+    } catch (error) {
       notifierService.notify('error', 'Error when trying to download file - ' + error);
     }
   }
 
-  public downloadXml(xmlFile:XmlDto, notifierService: NotifierService):void {
+  public downloadXml(xmlFile: XmlDto, notifierService: NotifierService): void {
     if (!xmlFile) {
       notifierService.notify('error', 'No file to download');
       return;
@@ -89,7 +68,7 @@ export class FileHelperService {
     this.downloadFile(fileContent, fileType, fileName, notifierService);
   }
 
-  public downloadDoc(docFile:DocDto, notifierService: NotifierService):void {
+  public downloadDoc(docFile: DocDto, notifierService: NotifierService): void {
     if (!docFile) {
       notifierService.notify('error', 'No file to download');
       return;
@@ -106,40 +85,32 @@ export class FileHelperService {
     this.downloadBase64File(fileContent, fileType, fileName, notifierService);
   }
 
-  public downloadBase64File(base64Content:string, fileType:string, fileName:string, notifierService: NotifierService):void {
+  public downloadBase64File(base64Content: string, fileType: string, fileName: string, notifierService: NotifierService): void {
     try {
       let byteArray = this.convertBase64ToByteArray(base64Content);
 
       let blob = new Blob([byteArray], {type: fileType});
       fileSaver.saveAs(blob, fileName);
-    } catch ( error ) {
+    } catch (error) {
       notifierService.notify('error', 'Error when trying to download file - ' + error);
     }
   }
 
-  public downloadFile(content:string, fileType:string, fileName:string, notifierService: NotifierService):void {
+  public downloadFile(content: string, fileType: string, fileName: string, notifierService: NotifierService): void {
     try {
       let blob = new Blob([content], {type: fileType});
       fileSaver.saveAs(blob, fileName);
-    } catch ( error ) {
+    } catch (error) {
       notifierService.notify('error', 'Error when trying to download file - ' + error);
     }
   }
 
   private convertBase64ToByteArray(base64Content: string): Uint8Array {
-    let byteCharacters  = window.atob(base64Content);
+    let byteCharacters = window.atob(base64Content);
     let byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     return new Uint8Array(byteNumbers);
-  }
-
-  private replaceNewLines(stringToReplace: string) {
-    let replaceString = "\n";
-    if (navigator.appVersion.indexOf("Win")!=-1){
-      replaceString = "\r\n";
-    }
-    return (!stringToReplace) ? '' : stringToReplace.replace(/(\\n)/gm, replaceString);
   }
 }

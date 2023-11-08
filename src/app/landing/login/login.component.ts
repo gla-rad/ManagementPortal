@@ -40,14 +40,17 @@ export class LoginComponent implements OnInit {
    * value for version of the portal
    */
   version = AppConfig.MP_VERSION;
-
+  logo_img = AppConfig.LOGO_IMG;
+  environmentName = this.capitalize(AppConfig.ENVIRONMENT_NAME);
+  serviceProviderName = AppConfig.MP_NAME;
+  footerLink = AppConfig.FOOTER_LINK;
+  footerName = AppConfig.FOOTER_NAME;
   currentLang = 'en-GB';
   selectedCountryCode = 'gb';
   countryCodes = langs.map(e => e.split('-').pop().toLowerCase());
   /**
    * environment name to show at front
    */
-  environmentName = this.capitalize(AppConfig.ENVIRONMENT_NAME);
 
   constructor(
     private authService: AuthService,
