@@ -84,9 +84,8 @@ export class SrSearchComponent implements OnInit {
   onUpdateLuceneQuery = (query: LuceneQueryOutput) => {
     this.queryString = query.queryString ? query.queryString : '';
     this.luceneQueryStringInput.nativeElement.value = this.queryString;
-
-    // get rid of " to convert it to the freetext
-    this.freetext = this.queryString.split('"').join('');
+    // convert /: to : to make it a valid freetext for MRN
+    this.freetext = this.queryString.split('\\').join('');
     if (this.queryString.length === 0) {
       this.clearAll();
     }
@@ -100,7 +99,8 @@ export class SrSearchComponent implements OnInit {
   search = (searchParams: SearchParameters, wktString: string, freetext: string) => {
     this.isLoading = true;
     // send a query with given geometry, converted to WKT
-    this.secomSearchController.search({query: searchParams, geometry: wktString, freetext: freetext })
+    const query = wktString && wktString.length ? {query: searchParams, geometry: wktString, freetext: freetext } : {query: searchParams, freetext: freetext }
+    this.secomSearchController.search(query)
     .subscribe(res => {
       this.instances = res.searchServiceResult;
       this.refreshData(this.instances);
