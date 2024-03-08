@@ -36,6 +36,7 @@ export class AppConfig {
   static TERMS_OF_USE: string;
   static MP_CONTACT: string;
   static MP_VERSION: string;
+  static APP_BASE_HREF: string;
   static MP_NAME: string;
   static FOOTER_NAME: string;
   static FOOTER_LINK: string;
@@ -63,6 +64,7 @@ export class AppConfig {
     AppConfig.FOOTER_NAME = environment.footerName;
     AppConfig.FOOTER_LINK = environment.footerLink;
     AppConfig.LOGO_IMG = environment.logoImg;
+    AppConfig.APP_BASE_HREF = environment.appBaseHref === undefined || environment.appBaseHref === null ? "/" : environment.appBaseHref;
   }
 }
 AppConfig._initialize();

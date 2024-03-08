@@ -118,13 +118,13 @@ private createAuthState(): AuthState {
   }
 
   loginUrl(): string {
-    return '/login';
+    return AppConfig.APP_BASE_HREF + '/login';
   }
 
   login() {
   	const url = window.location;
     AuthService.staticAuthInfo.authz.login({
-      redirectUri:  url.protocol + '//' + url.host + '/pages/ir/organizations/'
+      redirectUri:  url.protocol + '//' + url.host + AppConfig.APP_BASE_HREF + '/pages/ir/organizations/'
     });
   }
 
@@ -132,7 +132,7 @@ private createAuthState(): AuthState {
 	  try {
       this.authState.loggedIn = false;
       const url = window.location;
-      const loginPage = url.protocol + '//' + url.host + '/login';
+      const loginPage = url.protocol + '//' + url.host + AppConfig.APP_BASE_HREF + '/login';
 		  AuthService.staticAuthInfo.authz.logout(loginPage);
 		  AuthService.staticAuthInfo.authz = null;
 	  } catch (err) { // State is somehow lost. Just do nothing.

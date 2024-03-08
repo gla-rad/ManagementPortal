@@ -30,5 +30,14 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 4200 for serving the Angular app
 EXPOSE 4200
 
+# Support for a different app base href
+COPY src/index.template.html /usr/share/nginx/html/index.template.html
+
 # Start the NGINX server
-CMD ["nginx", "-g", "daemon off;"]
+# Replace the environment variables with the onces provided in docker before
+# moving on to start the nginx web-server
+CMD ["/bin/sh",  "-c",  \
+    "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js \
+    && export APP_BASE_HREF_DEFAULT=\"${APP_BASE_HREF:-/}\" \
+    && envsubst '$APP_BASE_HREF_DEFAULT' < /usr/share/nginx/html/index.template.html > /usr/share/nginx/html/index.html \
+    && exec nginx -g 'daemon off;'"]
