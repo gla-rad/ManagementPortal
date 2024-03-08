@@ -141,7 +141,7 @@ private createAuthState(): AuthState {
 
   public getLogoutUrl(): string {
     const url = window.location;
-    const loginPage = url.protocol + '//' + url.host + '/login';
+    const loginPage = url.protocol + '//' + url.host + AppConfig.APP_BASE_HREF + '/login';
     return AppConfig.OIDC_BASE_PATH + '/auth/realms/'+this.realmName+'/protocol/openid-connect/logout?redirect_uri=' + loginPage;
   }
 
