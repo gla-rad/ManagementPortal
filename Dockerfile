@@ -39,5 +39,5 @@ COPY src/index.template.html /usr/share/nginx/html/index.template.html
 CMD ["/bin/sh",  "-c",  \
     "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js \
     && export APP_BASE_HREF_DEFAULT=\"${APP_BASE_HREF:-/}\" \
-    && envsubst '$APP_BASE_HREF_DEFAULT' < /usr/share/nginx/html/index.template.html > /usr/share/nginx/html/index.html \
+    && sed -i \"s|<base href=\\\"/\\\">|<base href=\\\"${APP_BASE_HREF_DEFAULT}\\\">|g\" /usr/share/nginx/html/index.html \
     && exec nginx -g 'daemon off;'"]
