@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --save --legacy-deps
+RUN npm install --save --legacy-peer-deps
 
 # Install the specific @types/ws package version
 RUN npm install @types/ws@8.5.4
