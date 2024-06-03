@@ -69,5 +69,5 @@ import { customNotifierOptions } from './shared/customNotifierOption';
 export class AppModule {
 }
 export function httpTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http);
+  return new TranslateHttpLoader(http, './assets/i18n/');
 }
