@@ -20,7 +20,7 @@ export interface SearchObjectResult {
     organizationId: string;
     endpointUri: string;
     endpointType: string;
-    keywords: string;
+    keywords?: string;
     unlocode?: Array<string>;
     instanceAsXml?: string;
     publishedAt?: Date;
